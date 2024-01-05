@@ -1,0 +1,8 @@
+apiVersion: azure.platform.upbound.io/v1alpha1
+kind: XNetwork
+metadata:
+  name: configuration-azure-aks
+spec:
+  parameters:
+    id: configuration-azure-aks
+    region: westus
