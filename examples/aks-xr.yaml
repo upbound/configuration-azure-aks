@@ -8,7 +8,7 @@ spec:
     region: westus
     version: "1.27.3"
     nodes:
-      count: 3
+      count: 1
       instanceType: Standard_B2s
   writeConnectionSecretToRef:
     name: configuration-azure-aks-kubeconfig
