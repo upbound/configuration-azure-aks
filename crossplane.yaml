@@ -6,6 +6,11 @@ metadata:
     meta.crossplane.io/maintainer: Upbound <support@upbound.io>
     meta.crossplane.io/source: github.com/upbound/configuration-azure-aks
     meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: |
+      Azure AKS Configuration is reusable Configuration designed to be primarily used in higher level Configurations.
+    meta.crossplane.io/readme: |
+      This configuration bundles an Upbound Cloud extension and an API definition. This API allows control planes to provision Azure AKS clusters, composed using cloud service primitives from the Upbound Official Providers
+
 spec:
   crossplane:
     version: ">=v1.14.1-0"
