@@ -13,7 +13,7 @@ The core components of a custom API in [Crossplane](https://docs.crossplane.io/l
 In this specific configuration, the AKS API contains:
 
 - **an [AKS](/apis/definition.yaml) custom resource type.**
-- **Composition of the AKS resources:** Configured in [/apis/composition.yaml](/apis/composition.yaml), it provisions an [] and resources in the `upbound-system` namespace.
+- **Composition of the AKS resources:** Configured in [/apis/composition.yaml](/apis/composition.yaml), it provisions an AKS cluster and resources and fundamental security and networking resources in the `upbound-system` namespace.
 
 This repository contains an Composite Resource (XR) file.
 
