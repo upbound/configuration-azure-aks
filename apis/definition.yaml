@@ -45,10 +45,11 @@ spec:
                       description: Kubernetes version
                       type: string
                       enum:
-                        - "1.27.3"
-                        - "1.26.6"
-                        - "1.25.11"
-                      default: "1.27.3"
+                        - "1.29"
+                        - "1.28"
+                        - "1.27"
+                        - "1.26"
+                      default: "1.29"
                     nodes:
                       type: object
                       description: AKS node configuration parameters.
