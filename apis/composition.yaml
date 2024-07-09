@@ -43,6 +43,8 @@ spec:
                     - name: default
                   identity:
                     - type: SystemAssigned
+                  oidcIssuerEnabled: true
+                  workloadIdentityEnabled: true
             connectionDetails:
               - fromConnectionSecretKey: kubeconfig
                 name: kubeconfig
@@ -91,6 +93,38 @@ spec:
                     string:
                       fmt: '%s-akscluster'
                       type: Format
+              - type: ToCompositeFieldPath
+                fromFieldPath: status.atProvider.oidcIssuerUrl
+                policy:
+                  fromFieldPath: Optional
+                toFieldPath: status.aks.oidcUrl
+          - name: workloadIdentitySettings
+            base:
+              apiVersion: kubernetes.crossplane.io/v1alpha1
+              kind: Object
+              spec:
+                deletionPolicy: Orphan
+                forProvider:
+                  manifest:
+                    apiVersion: v1
+                    kind: ConfigMap
+                    metadata:
+                      namespace: default
+            patches:
+              - fromFieldPath: spec.parameters.id
+                toFieldPath: spec.providerConfigRef.name
+                type: FromCompositeFieldPath
+              - fromFieldPath: spec.parameters.id
+                toFieldPath: spec.forProvider.manifest.metadata.name
+                transforms:
+                  - string:
+                      fmt: '%s-workloadidentity-settings'
+                      type: Format
+                    type: string
+                type: FromCompositeFieldPath
+              - fromFieldPath: status.aks.oidcUrl
+                toFieldPath: spec.forProvider.manifest.data.oidc_url
+                type: FromCompositeFieldPath
 
           - name: providerConfigHelm
             base:
