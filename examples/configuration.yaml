@@ -3,4 +3,4 @@ kind: Configuration
 metadata:
   name: configuration-azure-aks
 spec:
-  package: xpkg.upbound.io/upbound/configuration-azure-aks:v0.10.0
+  package: xpkg.upbound.io/upbound/configuration-azure-aks:v0.11.0
