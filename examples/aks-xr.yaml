@@ -6,7 +6,7 @@ spec:
   parameters:
     id: configuration-azure-aks
     region: westus
-    version: "1.28"
+    version: "1.31"
     nodes:
       count: 1
       instanceType: Standard_B2s
