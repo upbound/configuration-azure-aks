@@ -1,0 +1,16 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xaks.azure.platform.upbound.io
+spec:
+  compositeTypeRef:
+    apiVersion: azure.platform.upbound.io/v1alpha1
+    kind: XAKS
+  mode: Pipeline
+  pipeline:
+  - functionRef:
+      name: upbound-configuration-azure-aksxaks
+    step: xaks
+  - functionRef:
+      name: crossplane-contrib-function-auto-ready
+    step: crossplane-contrib-function-auto-ready

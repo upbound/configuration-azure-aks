@@ -1,0 +1,27 @@
+apiVersion: meta.dev.upbound.io/v1alpha1
+kind: Project
+metadata:
+  name: configuration-azure-aks
+spec:
+  dependsOn:
+  - function: xpkg.upbound.io/crossplane-contrib/function-auto-ready
+    version: '>=v0.0.0'
+  - provider: xpkg.upbound.io/upbound/provider-azure-containerservice
+    # renovate: datasource=github-releases depName=upbound/provider-azure
+    version: "v1.8.0"
+  - configuration: xpkg.upbound.io/upbound/configuration-azure-network
+    # renovate: datasource=github-releases depName=upbound/configuration-azure-network
+    version: "v0.15.0"
+  - provider: xpkg.upbound.io/upbound/provider-helm
+    # renovate: datasource=github-releases depName=upbound/provider-helm
+    version: "v0.20.0"
+  - provider: xpkg.upbound.io/upbound/provider-kubernetes
+    # renovate: datasource=github-releases depName=upbound/provider-kubernetes
+    version: "v0.16.0"
+  description: Azure AKS Configuration is reusable Configuration designed to be primarily used in higher level Configurations.
+  license: Apache-2.0
+  maintainer: Upbound <support@upbound.io>
+  readme: |
+    This configuration bundles an Upbound Cloud extension and an API definition. This API allows control planes to provision Azure AKS clusters, composed using cloud service primitives from the Upbound Official Providers
+  repository: xpkg.upbound.io/upbound/configuration-azure-aks
+  source: https://github.com/upbound/configuration-azure-aks
