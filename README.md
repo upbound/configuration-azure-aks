@@ -1,39 +1,40 @@
 # Azure AKS Configuration
 
-
-This repository contains a [Crossplane configuration](https://docs.crossplane.io/latest/concepts/packages/#configuration-packages), tailored for users establishing their initial control plane with [Upbound](https://cloud.upbound.io). This configuration deploys fully managed [Azure AKS](https://azure.microsoft.com/en-us/products/kubernetes-service) instances.
+This repository contains an Upbound project, tailored for users establishing their initial control plane with [Upbound](https://cloud.upbound.io). This configuration deploys fully managed [Azure AKS](https://azure.microsoft.com/en-us/products/kubernetes-service) instances.
 
 ## Overview
 
-The core components of a custom API in [Crossplane](https://docs.crossplane.io/latest/getting-started/introduction/) include:
+The core components of a custom API in [Upbound Project](https://docs.upbound.io/learn/control-plane-project/) include:
 
 - **CompositeResourceDefinition (XRD):** Defines the API's structure.
-- **Composition(s):** Implements the API by orchestrating a set of Crossplane managed resources.
+- **Composition(s):** Configures the Functions Pipeline
+- **Embedded Function(s):** Encapsulates the Composition logic and implementation within a self-contained, reusable unit
 
-In this specific configuration, the AKS API contains:
+In this specific configuration, the API contains:
 
-- **an [AKS](/apis/definition.yaml) custom resource type.**
-- **Composition of the AKS resources:** Configured in [/apis/composition.yaml](/apis/composition.yaml), it provisions an AKS cluster and resources and fundamental security and networking resources in the `upbound-system` namespace.
-
-This repository contains an Composite Resource (XR) file.
+- **an [Azure AKS](/apis/xaks/definition.yaml) custom resource type.**
+- **Composition:** Configured in [/apis/xaks/composition.yaml](/apis/xaks/composition.yaml)
+- **Embedded Function:** The Composition logic is encapsulated within [embedded function](/functions/xaks/main.k)
 
 ## Deployment
 
-```shell
-apiVersion: pkg.crossplane.io/v1
-kind: Configuration
-metadata:
-  name: configuration-azure-aks
-spec:
-  package: xpkg.upbound.io/upbound/configuration-azure-aks:v0.3.0
-```
+- Execute `up project run`
+- Alternatively, install the Configuration from the [Upbound Marketplace](https://marketplace.upbound.io/configurations/upbound/configuration-azure-aks)
+- Check [examples](/examples/) for example XR(Composite Resource)
+
+## Testing
+
+The configuration can be tested using:
+
+- `up composition render --xrd=apis/xaks/definition.yaml apis/xaks/composition.yaml examples/xaks/xaks.yaml` to render the composition
+- `up test run tests/*` to run composition tests in `tests/test-xaks/`
+- `up test run tests/* --e2e` to run end-to-end tests in `tests/e2etest-xaks/`
 
 ## Next steps
 
-This repository serves as a foundational step. To enhance your control plane, consider:
+This repository serves as a foundational step. To enhance your configuration, consider:
 
 1. create new API definitions in this same repo
 2. editing the existing API definition to your needs
 
-
-Upbound will automatically detect the commits you make in your repo and build the configuration package for you. To learn more about how to build APIs for your managed control planes in Upbound, read the guide on Upbound's docs.
+To learn more about how to build APIs for your managed control planes in Upbound, read the guide on [Upbound's docs](https://docs.upbound.io/).
