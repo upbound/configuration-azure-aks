@@ -7,17 +7,15 @@ spec:
   - function: xpkg.upbound.io/crossplane-contrib/function-auto-ready
     version: '>=v0.0.0'
   - provider: xpkg.upbound.io/upbound/provider-azure-containerservice
-    # renovate: datasource=github-releases depName=upbound/provider-azure
-    version: "v1.8.0"
+    version: "v1"
   - configuration: xpkg.upbound.io/upbound/configuration-azure-network
     # renovate: datasource=github-releases depName=upbound/configuration-azure-network
     version: "v0.15.0"
   - provider: xpkg.upbound.io/upbound/provider-helm
-    # renovate: datasource=github-releases depName=upbound/provider-helm
-    version: "v0.20.0"
+    version: "v0"
   - provider: xpkg.upbound.io/upbound/provider-kubernetes
     # renovate: datasource=github-releases depName=upbound/provider-kubernetes
-    version: "v0.16.0"
+    version: "v0"
   description: Azure AKS Configuration is reusable Configuration designed to be primarily used in higher level Configurations.
   license: Apache-2.0
   maintainer: Upbound <support@upbound.io>
