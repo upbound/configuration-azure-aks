@@ -61,6 +61,7 @@ _items = [
                                 vnetSubnetIdSelector = {
                                     matchLabels = {
                                         "azure.platform.upbound.io/network-id" = "configuration-azure-aks"
+                                        "azure.platform.upbound.io/subnet-service-type" = "general"
                                     }
                                 }
                             }
