@@ -75,6 +75,7 @@ _composition = ObservedComposedResources {
                     vmSize = oxrParams.nodes.instanceType
                     vnetSubnetIdSelector.matchLabels = {
                         "azure.platform.upbound.io/network-id" = oxrParams.id
+                        "azure.platform.upbound.io/subnet-service-type" = "general"
                     }
                 }
                 dnsPrefix = oxrParams.id
