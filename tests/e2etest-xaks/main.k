@@ -48,6 +48,8 @@ _items = [
                         parameters = {
                             id = "configuration-azure-aks"
                             region = "westus"
+                            addressRange = "10.1.0.0/16"
+                            generalSubnetRange = "10.1.1.0/24"
                         }
                     }
                 }
