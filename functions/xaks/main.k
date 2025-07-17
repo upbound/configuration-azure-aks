@@ -11,6 +11,7 @@ schema ObservedComposedResources:
     workloadIdentitySettings: kubernetesv1alpha1.Object
     providerConfigHelm: helmv1beta1.ProviderConfig
     providerConfigKubernetes: kubernetesv1alpha1.ProviderConfig
+    compositeConnectionDetails: CompositeConnectionDetails
 
 schema DefaultSpec:
     deletionPolicy: str
@@ -29,7 +30,6 @@ ocds = option("params").ocds
 oxrParams = xaks.XAKS.spec.parameters {**oxr.spec.parameters}
 oxrSpec = xaks.XAKS.spec {**oxr.spec}
 oxrMeta = metav1.ObjectMeta {**oxr.metadata}
-
 # unified metadata declaration
 _metadata = lambda name: str -> any {
     {
@@ -116,7 +116,7 @@ _composition = ObservedComposedResources {
             }
         }
     }
-    providerConfigHelm = helmv1beta1.ProviderConfig{
+    providerConfigHelm = helmv1beta1.ProviderConfig {
         metadata: {
             **_metadata("providerConfigHelm")
             annotations: {
@@ -135,7 +135,7 @@ _composition = ObservedComposedResources {
             }
         }
     }
-    providerConfigKubernetes = kubernetesv1alpha1.ProviderConfig{
+    providerConfigKubernetes = kubernetesv1alpha1.ProviderConfig {
         metadata = {
             **_metadata("providerConfigKubernetes")
             annotations: {
@@ -152,6 +152,12 @@ _composition = ObservedComposedResources {
                 }
                 source = "Secret"
             }
+        }
+    }
+    compositeConnectionDetails = CompositeConnectionDetails {
+        data: {
+            if "kubernetesCluster" in ocds:
+                kubeconfig = ocds?.kubernetesCluster?.ConnectionDetails?.kubeconfig
         }
     }
 }
