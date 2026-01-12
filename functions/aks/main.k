@@ -1,34 +1,32 @@
-import models.io.upbound.azure.containerservice.v1beta2 as azureContainerServicev1beta2
-import models.io.upbound.platform.azure.v1alpha1.xaks
+import models.io.upbound.azurem.containerservice.v1beta1 as azureContainerServicev1beta1
+import models.io.upbound.platform.azure.v1alpha1.aks
 import models.k8s.apimachinery.pkg.apis.meta.v1 as metav1
-import models.io.crossplane.kubernetes.v1alpha1 as kubernetesv1alpha1
-import models.io.crossplane.helm.v1beta1 as helmv1beta1
+import models.io.k8s.api.core.v1 as corev1
+import models.io.crossplane.kubernetesm.v1alpha1 as kubernetesv1alpha1
+import models.io.crossplane.helmm.v1beta1 as helmv1beta1
+import base64
 
 # schema definitions
 schema ObservedComposedResources:
-    dxr: xaks.XAKS
-    kubernetesCluster: azureContainerServicev1beta2.KubernetesCluster
+    dxr: aks.AKS
+    kubernetesCluster: azureContainerServicev1beta1.KubernetesCluster
     workloadIdentitySettings: kubernetesv1alpha1.Object
     providerConfigHelm: helmv1beta1.ProviderConfig
     providerConfigKubernetes: kubernetesv1alpha1.ProviderConfig
-    compositeConnectionDetails: CompositeConnectionDetails
+    connectionSecret: corev1.Secret
 
 schema DefaultSpec:
-    deletionPolicy: str
+    managementPolicies: [str]
     providerConfigRef: {str:str}
     forProvider: {str:str}
-
-schema CompositeConnectionDetails:
-    apiVersion: str = "meta.krm.kcl.dev/v1alpha1"
-    kind: str = "CompositeConnectionDetails"
-    data: {str:str}
 
 # external parameter initialization
 dxr = option("params").dxr
 oxr = option("params").oxr
 ocds = option("params").ocds
-oxrParams = xaks.XAKS.spec.parameters {**oxr.spec.parameters}
-oxrSpec = xaks.XAKS.spec {**oxr.spec}
+_ocds = option("params").ocds or {}
+oxrParams = aks.AKS.spec.parameters {**oxr.spec.parameters}
+oxrSpec = aks.AKS.spec {**oxr.spec}
 oxrMeta = metav1.ObjectMeta {**oxr.metadata}
 # unified metadata declaration
 _metadata = lambda name: str -> any {
@@ -38,8 +36,9 @@ _metadata = lambda name: str -> any {
 }
 # spec defaults
 _defaultSpec = DefaultSpec {
-    deletionPolicy = oxrParams.deletionPolicy or "Delete"
+    managementPolicies = ["*"]
     providerConfigRef = {
+        kind = "ProviderConfig"
         name = oxrParams.providerConfigName or "default"
     }
     forProvider = {
@@ -48,7 +47,7 @@ _defaultSpec = DefaultSpec {
 }
 # main composition
 _composition = ObservedComposedResources {
-    dxr = xaks.XAKS {
+    dxr = aks.AKS {
         **dxr
         spec.parameters = {
             id = oxrSpec.parameters.id
@@ -57,11 +56,11 @@ _composition = ObservedComposedResources {
         }
         status = {
             aks = {
-                oidcUrl = ocds?.kubernetesCluster?.status?.atProvider?.oidcIssuerUrl
+                oidcUrl = _ocds?.kubernetesCluster?.Resource?.status?.atProvider?.oidcIssuerUrl
             }
         }
     }
-    kubernetesCluster = azureContainerServicev1beta2.KubernetesCluster {
+    kubernetesCluster = azureContainerServicev1beta1.KubernetesCluster {
         metadata = {
             **_metadata("kubernetesCluster")
             name = "{}-aks".format(oxrParams.id)
@@ -90,14 +89,13 @@ _composition = ObservedComposedResources {
             }
             writeConnectionSecretToRef = {
                 name = "{}-akscluster".format(oxrMeta.uid)
-                namespace = oxrSpec.writeConnectionSecretToRef.namespace
             }
         }
     }
     workloadIdentitySettings = kubernetesv1alpha1.Object {
         metadata = _metadata("workloadIdentitySettings")
         spec = {
-            deletionPolicy = "Orphan"
+            managementPolicies = ["Create", "Observe", "Update", "LateInitialize"]
             forProvider = {
                 manifest = {
                     apiVersion = "v1"
@@ -112,6 +110,7 @@ _composition = ObservedComposedResources {
                 }
             }
             providerConfigRef = {
+                kind = "ProviderConfig"
                 name = oxrSpec.parameters.id
             }
         }
@@ -129,7 +128,7 @@ _composition = ObservedComposedResources {
                 secretRef = {
                     key = "kubeconfig"
                     name = "{}-akscluster".format(oxrMeta.uid)
-                    namespace = oxrSpec.writeConnectionSecretToRef.namespace
+                    namespace = oxrMeta.namespace
                 }
                 source = "Secret"
             }
@@ -148,17 +147,30 @@ _composition = ObservedComposedResources {
                 secretRef = {
                     key = "kubeconfig"
                     name = "{}-akscluster".format(oxrMeta.uid)
-                    namespace = oxrSpec.writeConnectionSecretToRef.namespace
+                    namespace = oxrMeta.namespace
                 }
                 source = "Secret"
             }
         }
     }
-    compositeConnectionDetails = CompositeConnectionDetails {
-        data: {
-            if "kubernetesCluster" in ocds:
-                kubeconfig = ocds?.kubernetesCluster?.ConnectionDetails?.kubeconfig
+    connectionSecret = corev1.Secret {
+        metadata = {
+            name = "{}-connection".format(oxrMeta.name)
+            namespace = oxrMeta.namespace
+            annotations = {
+                "krm.kcl.dev/composition-resource-name" = "connection-secret"
+            }
+            labels = {
+                "crossplane.io/composite" = oxrMeta.name
+            }
         }
+        type = "connection.crossplane.io/v1alpha1"
+        if "kubernetesCluster" in _ocds:
+            data = {
+                kubeconfig = _ocds.kubernetesCluster.ConnectionDetails?.kubeconfig or ""
+            }
+        else:
+            data = {}
     }
 }
 # special render function

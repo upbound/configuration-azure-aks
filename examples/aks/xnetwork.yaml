@@ -1,0 +1,11 @@
+apiVersion: azure.platform.upbound.io/v1alpha1
+kind: Network
+metadata:
+  name: configuration-azure-aks
+  namespace: default
+spec:
+  parameters:
+    id: configuration-azure-aks
+    region: westus
+    addressRange: "10.1.0.0/16"
+    generalSubnetRange: "10.1.1.0/24"

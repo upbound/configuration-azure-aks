@@ -1,7 +1,7 @@
-
-import models.io.crossplane.helm.v1beta1 as helmv1beta1
-import models.io.crossplane.kubernetes.v1alpha1 as kubernetesv1alpha1
-import models.io.upbound.azure.containerservice.v1beta2 as containerservicev1beta2
+import models.io.crossplane.helmm.v1beta1 as helmv1beta1
+import models.io.crossplane.kubernetesm.v1alpha1 as kubernetesv1alpha1
+import models.io.k8s.api.core.v1 as corev1
+import models.io.upbound.azurem.containerservice.v1beta1 as containerservicev1beta1
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.io.upbound.platform.azure.v1alpha1 as upazurev1alpha1
 
@@ -11,9 +11,10 @@ _items = [
         metadata.name: "test-happy-path"
         spec= {
             assertResources: [
-                upazurev1alpha1.XAKS{
+                upazurev1alpha1.AKS{
                     metadata = {
                         name = "configuration-azure-aks"
+                        namespace = "default"
                     }
                     spec = {
                         parameters = {
@@ -23,20 +24,15 @@ _items = [
                                 instanceType = "Standard_B2s"
                             }
                             region = "westus"
-                            version = "1.31"
-                        }
-                        writeConnectionSecretToRef = {
-                            name = "configuration-azure-aks-kubeconfig"
-                            namespace = "upbound-system"
+                            version = "1.34"
                         }
                     }
                 }
-                containerservicev1beta2.KubernetesCluster{
+                containerservicev1beta1.KubernetesCluster{
                     metadata = {
                         annotations = {
                             "crossplane.io/composition-resource-name" = "kubernetesCluster"
                         }
-                        generateName = "configuration-azure-aks-"
                         labels = {
                             "crossplane.io/composite" = "configuration-azure-aks"
                         }
@@ -46,13 +42,18 @@ _items = [
                                 apiVersion = "azure.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XAKS"
+                                kind = "AKS"
                                 name = "configuration-azure-aks"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
+                        providerConfigRef = {
+                            kind = "ProviderConfig"
+                            name = "default"
+                        }
+                        managementPolicies = ["*"]
                         forProvider = {
                             defaultNodePool = {
                                 name = "default"
@@ -69,7 +70,7 @@ _items = [
                             identity = {
                                 $type = "SystemAssigned"
                             }
-                            kubernetesVersion = "1.31"
+                            kubernetesVersion = "1.34"
                             location = "westus"
                             oidcIssuerEnabled = True
                             resourceGroupNameSelector = {
@@ -81,7 +82,6 @@ _items = [
                         }
                         writeConnectionSecretToRef = {
                             name: "Undefined-akscluster"
-                            namespace = "upbound-system"
                         }
                     }
                 }
@@ -100,7 +100,7 @@ _items = [
                                 apiVersion = "azure.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XAKS"
+                                kind = "AKS"
                                 name = "configuration-azure-aks"
                                 uid = ""
                             }
@@ -111,7 +111,7 @@ _items = [
                             secretRef = {
                                 key = "kubeconfig"
                                 name = "Undefined-akscluster"
-                                namespace = "upbound-system"
+                                namespace = "default"
                             }
                             source = "Secret"
                         }
@@ -131,7 +131,7 @@ _items = [
                                 apiVersion = "azure.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XAKS"
+                                kind = "AKS"
                                 name = "configuration-azure-aks"
                                 uid = ""
                             }
@@ -141,8 +141,8 @@ _items = [
                         credentials = {
                             secretRef = {
                                 key = "kubeconfig"
-                                namespace = "upbound-system"
                                 name = "Undefined-akscluster"
+                                namespace = "default"
                             }
                             source = "Secret"
                         }
@@ -161,14 +161,18 @@ _items = [
                                 apiVersion = "azure.platform.upbound.io/v1alpha1"
                                 blockOwnerDeletion = True
                                 controller = True
-                                kind = "XAKS"
+                                kind = "AKS"
                                 name = "configuration-azure-aks"
                                 uid = ""
                             }
                         ]
                     }
                     spec = {
-                        deletionPolicy = "Orphan"
+                        providerConfigRef = {
+                            kind = "ProviderConfig"
+                            name = "configuration-azure-aks"
+                        }
+                        managementPolicies = ["Create", "Observe", "Update", "LateInitialize"]
                         forProvider = {
                             manifest = {
                                 apiVersion = "v1"
@@ -179,16 +183,26 @@ _items = [
                                 }
                             }
                         }
-                        providerConfigRef = {
-                            name = "configuration-azure-aks"
+                    }
+                }
+                corev1.Secret{
+                    metadata = {
+                        name = "configuration-azure-aks-connection"
+                        namespace = "default"
+                        annotations = {
+                            "crossplane.io/composition-resource-name" = "connection-secret"
+                        }
+                        labels = {
+                            "crossplane.io/composite" = "configuration-azure-aks"
                         }
                     }
+                    type = "connection.crossplane.io/v1alpha1"
                 }
 
             ]
-            compositionPath: "apis/xaks/composition.yaml"
-            xrPath: "examples/xaks/xaks.yaml"
-            xrdPath: "apis/xaks/definition.yaml"
+            compositionPath: "apis/aks/composition.yaml"
+            xrPath: "examples/aks/aks.yaml"
+            xrdPath: "apis/aks/definition.yaml"
             timeoutSeconds: 60
             validate: False
         }

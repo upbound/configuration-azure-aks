@@ -1,4 +1,4 @@
-import models.io.upbound.azure.v1beta1 as azurev1beta1
+import models.io.upbound.azurem.v1beta1 as azurev1beta1
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.io.upbound.platform.azure.v1alpha1 as platformazurev1alpha1
 
@@ -9,8 +9,8 @@ _items = [
         spec = {
             # Configure Crossplane for the test environment
             crossplane = {
-                autoUpgrade.channel = "Rapid"
-                version = "1.18.3-up.1"
+                version = "2.0.2-up.5"
+                autoUpgrade.channel = "None"
             }
 
             # Define the conditions that indicate successful resource creation
@@ -20,29 +20,27 @@ _items = [
 
             # Define the resource to be created
             manifests = [
-                platformazurev1alpha1.XAKS{
+                platformazurev1alpha1.AKS{
                     metadata = {
                         name = "configuration-azure-aks"
+                        namespace = "default"
                     }
                     spec = {
                         parameters = {
                             id = "configuration-azure-aks"
                             region = "westus"
-                            version = "1.31"
+                            version = "1.34"
                             nodes = {
                                 count = 1
                                 instanceType = "Standard_B2s"
                             }
                         }
-                        writeConnectionSecretToRef = {
-                            name = "configuration-azure-aks-kubeconfig"
-                            namespace = "upbound-system"
-                        }
                     }
                 }
-                platformazurev1alpha1.XNetwork{
+                platformazurev1alpha1.Network{
                     metadata = {
                         name = "configuration-azure-aks"
+                        namespace = "default"
                     }
                     spec = {
                         parameters = {
@@ -58,7 +56,10 @@ _items = [
             # Define the provider configuration
             extraResources = [
                 azurev1beta1.ProviderConfig{
-                    metadata.name = "default"
+                    metadata = {
+                        name = "default"
+                        namespace = "default"
+                    }
                     spec = {
                         credentials = {
                             source = "Upbound"

@@ -1,0 +1,4 @@
+functions:
+- name: aks
+  path: functions/aks
+  type: KCL

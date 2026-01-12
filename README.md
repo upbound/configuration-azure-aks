@@ -2,6 +2,9 @@
 
 This repository contains an Upbound project, tailored for users establishing their initial control plane with [Upbound](https://cloud.upbound.io). This configuration deploys fully managed [Azure AKS](https://azure.microsoft.com/en-us/products/kubernetes-service) instances.
 
+**Crossplane Version:** v2.0+
+**API Version:** v2 (namespaced resources)
+
 ## Overview
 
 The core components of a custom API in [Upbound Project](https://docs.upbound.io/learn/control-plane-project/) include:
@@ -12,9 +15,9 @@ The core components of a custom API in [Upbound Project](https://docs.upbound.io
 
 In this specific configuration, the API contains:
 
-- **an [Azure AKS](/apis/xaks/definition.yaml) custom resource type.**
-- **Composition:** Configured in [/apis/xaks/composition.yaml](/apis/xaks/composition.yaml)
-- **Embedded Function:** The Composition logic is encapsulated within [embedded function](/functions/xaks/main.k)
+- **an [Azure AKS](/apis/aks/definition.yaml) custom resource type.**
+- **Composition:** Configured in [/apis/aks/composition.yaml](/apis/aks/composition.yaml)
+- **Embedded Function:** The Composition logic is encapsulated within [embedded function](/functions/aks/main.k)
 
 ## Deployment
 
@@ -26,9 +29,9 @@ In this specific configuration, the API contains:
 
 The configuration can be tested using:
 
-- `up composition render --xrd=apis/xaks/definition.yaml apis/xaks/composition.yaml examples/xaks/xaks.yaml` to render the composition
-- `up test run tests/*` to run composition tests in `tests/test-xaks/`
-- `up test run tests/* --e2e` to run end-to-end tests in `tests/e2etest-xaks/`
+- `up composition render --xrd=apis/aks/definition.yaml apis/aks/composition.yaml examples/aks/aks.yaml` to render the composition
+- `up test run tests/*` to run composition tests in `tests/test-aks/`
+- `up test run tests/* --e2e` to run end-to-end tests in `tests/e2etest-aks/`
 
 ## Next steps
 
