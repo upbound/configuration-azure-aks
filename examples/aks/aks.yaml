@@ -1,15 +1,14 @@
 apiVersion: azure.platform.upbound.io/v1alpha1
-kind: XAKS
+kind: AKS
 metadata:
   name: configuration-azure-aks
+  namespace: default
 spec:
   parameters:
     id: configuration-azure-aks
     region: westus
-    version: "1.31"
+    version: "1.34"
+    managementPolicies: ["*"]
     nodes:
       count: 1
       instanceType: Standard_B2s
-  writeConnectionSecretToRef:
-    name: configuration-azure-aks-kubeconfig
-    namespace: upbound-system

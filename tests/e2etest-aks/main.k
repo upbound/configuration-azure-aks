@@ -1,16 +1,15 @@
-import models.io.upbound.azure.v1beta1 as azurev1beta1
+import models.io.upbound.azurem.v1beta1 as azurev1beta1
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.io.upbound.platform.azure.v1alpha1 as platformazurev1alpha1
 
-
 _items = [
     metav1alpha1.E2ETest{
-        metadata.name = "e2etest-xaks-azure"
+        metadata.name = "e2etest-aks-azure"
         spec = {
             # Configure Crossplane for the test environment
             crossplane = {
+                version = "2.0.2-up.5"
                 autoUpgrade.channel = "Rapid"
-                version = "1.18.3-up.1"
             }
 
             # Define the conditions that indicate successful resource creation
@@ -20,29 +19,28 @@ _items = [
 
             # Define the resource to be created
             manifests = [
-                platformazurev1alpha1.XAKS{
+                platformazurev1alpha1.AKS{
                     metadata = {
                         name = "configuration-azure-aks"
+                        namespace = "default"
                     }
                     spec = {
                         parameters = {
                             id = "configuration-azure-aks"
                             region = "westus"
-                            version = "1.31"
+                            version = "1.34"
+                            managementPolicies = ["*"]
                             nodes = {
                                 count = 1
                                 instanceType = "Standard_B2s"
                             }
                         }
-                        writeConnectionSecretToRef = {
-                            name = "configuration-azure-aks-kubeconfig"
-                            namespace = "upbound-system"
-                        }
                     }
                 }
-                platformazurev1alpha1.XNetwork{
+                platformazurev1alpha1.Network{
                     metadata = {
                         name = "configuration-azure-aks"
+                        namespace = "default"
                     }
                     spec = {
                         parameters = {
@@ -50,6 +48,7 @@ _items = [
                             region = "westus"
                             addressRange = "10.1.0.0/16"
                             generalSubnetRange = "10.1.1.0/24"
+                            managementPolicies = ["*"]
                         }
                     }
                 }
@@ -58,7 +57,10 @@ _items = [
             # Define the provider configuration
             extraResources = [
                 azurev1beta1.ProviderConfig{
-                    metadata.name = "default"
+                    metadata = {
+                        name = "default"
+                        namespace = "default"
+                    }
                     spec = {
                         credentials = {
                             source = "Upbound"
@@ -68,7 +70,6 @@ _items = [
                         subscriptionID = "038f2b7c-3265-43b8-8624-c9ad5da610a8"
                     }
                 }
-
             ]
 
             # Test cleanup settings
