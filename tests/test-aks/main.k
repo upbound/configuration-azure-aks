@@ -22,7 +22,7 @@ _items = [
                                 instanceType = "Standard_B2s"
                             }
                             region = "westus"
-                            version = "1.31"
+                            version = "1.34"
                             managementPolicies = ["*"]
                         }
                     }
@@ -70,7 +70,7 @@ _items = [
                             identity = {
                                 $type = "SystemAssigned"
                             }
-                            kubernetesVersion = "1.31"
+                            kubernetesVersion = "1.34"
                             location = "westus"
                             oidcIssuerEnabled = True
                             resourceGroupNameSelector = {
