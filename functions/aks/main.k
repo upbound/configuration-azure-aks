@@ -8,9 +8,14 @@ schema DefaultSpec:
     providerConfigRef: {str:str}
     forProvider: {str:str}
 
-oxr = aks.AKS {**option("params").oxr}
+# Note: avoid casting the full OXR (e.g. AKS{**oxr}) because the
+# auto-generated model types status.conditions as a typed list which is
+# incompatible with the generic list Crossplane passes at runtime.
+# Instead, keep the raw OXR and cast only the sub-fields we need.
+oxr = option("params").oxr
 dxr = option("params").dxr
 ocds = option("params").ocds
+_params = aks.AKS.spec.parameters{**oxr.spec.parameters}
 
 _metadata = lambda name: str -> any {
     {
@@ -19,10 +24,10 @@ _metadata = lambda name: str -> any {
 }
 
 _defaultSpec = DefaultSpec {
-    managementPolicies = oxr.spec.parameters.managementPolicies or ["*"]
+    managementPolicies = _params.managementPolicies or ["*"]
     providerConfigRef = {
         kind = "ProviderConfig"
-        name = oxr.spec.parameters.providerConfigName or "default"
+        name = _params.providerConfigName or "default"
     }
     forProvider = {}
 }
@@ -31,9 +36,9 @@ _items = [
     aks.AKS {
         **dxr
         spec.parameters = {
-            id = oxr.spec.parameters.id
-            nodes = oxr.spec.parameters.nodes
-            region = oxr.spec.parameters.region
+            id = _params.id
+            nodes = _params.nodes
+            region = _params.region
         }
         status = {
             aks = {
@@ -44,28 +49,28 @@ _items = [
     azureContainerServicev1beta1.KubernetesCluster {
         metadata = {
             **_metadata("kubernetesCluster")
-            name = "{}-aks".format(oxr.spec.parameters.id)
+            name = "{}-aks".format(_params.id)
         }
         spec = {
             **_defaultSpec
             forProvider = {
                 defaultNodePool = {
                     name = "default"
-                    nodeCount = oxr.spec.parameters.nodes.count
-                    vmSize = oxr.spec.parameters.nodes.instanceType
+                    nodeCount = _params.nodes.count
+                    vmSize = _params.nodes.instanceType
                     vnetSubnetIdSelector.matchLabels = {
-                        "azure.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                        "azure.platform.upbound.io/network-id" = _params.id
                         "azure.platform.upbound.io/subnet-service-type" = "general"
                     }
                 }
-                dnsPrefix = oxr.spec.parameters.id
+                dnsPrefix = _params.id
                 identity.type = "SystemAssigned"
-                kubernetesVersion = oxr.spec.parameters.version
-                location = oxr.spec.parameters.region
+                kubernetesVersion = _params.version
+                location = _params.region
                 oidcIssuerEnabled = True
                 workloadIdentityEnabled = True
                 resourceGroupNameSelector.matchLabels = {
-                    "azure.platform.upbound.io/network-id" = oxr.spec.parameters.id
+                    "azure.platform.upbound.io/network-id" = _params.id
                 }
             }
             writeConnectionSecretToRef = {
@@ -82,7 +87,7 @@ _items = [
                     apiVersion = "v1"
                     kind = "ConfigMap"
                     metadata = {
-                        name = "{}-workloadidentity-settings".format(oxr.spec.parameters.id)
+                        name = "{}-workloadidentity-settings".format(_params.id)
                         namespace = "default"
                     }
                     data = {
@@ -92,7 +97,7 @@ _items = [
             }
             providerConfigRef = {
                 kind = "ProviderConfig"
-                name = oxr.spec.parameters.id
+                name = _params.id
             }
         }
     }
@@ -102,7 +107,7 @@ _items = [
             annotations: {
                 "krm.kcl.dev/ready" = "True"
             }
-            name = oxr.spec.parameters.id
+            name = _params.id
         }
         spec = {
             credentials = {
@@ -121,7 +126,7 @@ _items = [
             annotations: {
                 "krm.kcl.dev/ready" = "True"
             }
-            name = oxr.spec.parameters.id
+            name = _params.id
         }
         spec = {
             credentials = {
