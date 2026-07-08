@@ -1,0 +1,15 @@
+apiVersion: azure.platform.upbound.io/v1alpha1
+kind: AKS
+metadata:
+  name: configuration-azure-aks-zones
+  namespace: default
+spec:
+  parameters:
+    id: configuration-azure-aks-zones
+    region: westus
+    version: "1.35"
+    managementPolicies: ["*"]
+    nodes:
+      count: 1
+      instanceType: Standard_B2s
+      availabilityZones: ["1", "2", "3"]
