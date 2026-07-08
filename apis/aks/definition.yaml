@@ -47,12 +47,12 @@ spec:
                     items:
                       type: string
                       enum:
-                        - "*"
-                        - Create
-                        - Observe
-                        - Update
-                        - Delete
-                        - LateInitialize
+                      - "*"
+                      - Create
+                      - Observe
+                      - Update
+                      - Delete
+                      - LateInitialize
                     default: ["*"]
                   providerConfigName:
                     description: Crossplane ProviderConfig to use for provisioning this resources
