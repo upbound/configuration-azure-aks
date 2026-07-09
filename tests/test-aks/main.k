@@ -4,6 +4,10 @@ import models.io.upbound.azurem.containerservice.v1beta1 as containerservicev1be
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.io.upbound.platform.azure.v1alpha1 as upazurev1alpha1
 
+# Shared owner-reference uid for observed-resource fixtures: up v0.50.0 assigns
+# the composite a deterministic uid, and owner refs must match it.
+_ownerUid = "41fc1f8b-15d0-5034-be10-0ed93726503c"
+
 _items = [
     metav1alpha1.CompositionTest{
         metadata.name: "test-happy-path"
@@ -44,7 +48,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = "41fc1f8b-15d0-5034-be10-0ed93726503c"
+                                uid = _ownerUid
                             }
                         ]
                     }
@@ -102,7 +106,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = "41fc1f8b-15d0-5034-be10-0ed93726503c"
+                                uid = _ownerUid
                             }
                         ]
                     }
@@ -134,7 +138,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = "41fc1f8b-15d0-5034-be10-0ed93726503c"
+                                uid = _ownerUid
                             }
                         ]
                     }
@@ -166,7 +170,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = "41fc1f8b-15d0-5034-be10-0ed93726503c"
+                                uid = _ownerUid
                             }
                         ]
                     }
