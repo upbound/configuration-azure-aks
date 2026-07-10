@@ -4,6 +4,10 @@ import models.io.upbound.azurem.containerservice.v1beta1 as containerservicev1be
 import models.io.upbound.dev.meta.v1alpha1 as metav1alpha1
 import models.io.upbound.platform.azure.v1alpha1 as upazurev1alpha1
 
+# Shared owner-reference uid for observed-resource fixtures: up v0.50.0 assigns
+# the composite a deterministic uid, and owner refs must match it.
+_ownerUid = "41fc1f8b-15d0-5034-be10-0ed93726503c"
+
 _items = [
     metav1alpha1.CompositionTest{
         metadata.name: "test-happy-path"
@@ -44,7 +48,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = ""
+                                uid = _ownerUid
                             }
                         ]
                     }
@@ -102,7 +106,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = ""
+                                uid = _ownerUid
                             }
                         ]
                     }
@@ -134,7 +138,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = ""
+                                uid = _ownerUid
                             }
                         ]
                     }
@@ -157,6 +161,7 @@ _items = [
                         labels = {
                             "crossplane.io/composite" = "configuration-azure-aks"
                         }
+                        name = "configuration-azure-aks-d7b3b1c32862"
                         namespace = "default"
                         ownerReferences = [
                             {
@@ -165,7 +170,7 @@ _items = [
                                 controller = True
                                 kind = "AKS"
                                 name = "configuration-azure-aks"
-                                uid = ""
+                                uid = _ownerUid
                             }
                         ]
                     }
@@ -190,6 +195,110 @@ _items = [
             ]
             compositionPath: "apis/aks/composition.yaml"
             xrPath: "examples/aks/aks.yaml"
+            xrdPath: "apis/aks/definition.yaml"
+            timeoutSeconds: 60
+            validate: False
+        }
+    }
+    metav1alpha1.CompositionTest{
+        metadata.name: "test-status-propagation"
+        spec = {
+            observedResources: [
+                containerservicev1beta1.KubernetesCluster{
+                    metadata = {
+                        annotations = {
+                            "crossplane.io/composition-resource-name" = "kubernetesCluster"
+                        }
+                        labels = {
+                            "crossplane.io/composite" = "configuration-azure-aks"
+                        }
+                        name = "configuration-azure-aks-aks"
+                        namespace = "default"
+                    }
+                    spec = {
+                        forProvider = {
+                            defaultNodePool = {
+                                name = "default"
+                                nodeCount = 1
+                                vmSize = "Standard_B2s"
+                            }
+                        }
+                    }
+                    status = {
+                        atProvider = {
+                            oidcIssuerUrl = "https://westus.oic.prod-aks.azure.com/example/"
+                            defaultNodePool = {
+                                vmSize = "Standard_B2s"
+                            }
+                        }
+                    }
+                }
+            ]
+            assertResources: [
+                upazurev1alpha1.AKS{
+                    metadata = {
+                        name = "configuration-azure-aks"
+                        namespace = "default"
+                    }
+                    spec = {
+                        parameters = {
+                            id = "configuration-azure-aks"
+                            nodes = {
+                                count = 1
+                                instanceType = "Standard_B2s"
+                            }
+                            region = "westus"
+                            version = "1.34"
+                            managementPolicies = ["*"]
+                        }
+                    }
+                    status = {
+                        aks = {
+                            clusterName = "configuration-azure-aks-aks"
+                            oidcUrl = "https://westus.oic.prod-aks.azure.com/example/"
+                            nodes = {
+                                vmSize = "Standard_B2s"
+                            }
+                        }
+                    }
+                }
+            ]
+            compositionPath: "apis/aks/composition.yaml"
+            xrPath: "examples/aks/aks.yaml"
+            xrdPath: "apis/aks/definition.yaml"
+            timeoutSeconds: 60
+            validate: False
+        }
+    }
+    metav1alpha1.CompositionTest{
+        metadata.name: "test-availability-zones"
+        spec = {
+            assertResources: [
+                containerservicev1beta1.KubernetesCluster{
+                    metadata = {
+                        annotations = {
+                            "crossplane.io/composition-resource-name" = "kubernetesCluster"
+                        }
+                        labels = {
+                            "crossplane.io/composite" = "configuration-azure-aks-zones"
+                        }
+                        name = "configuration-azure-aks-zones-aks"
+                        namespace = "default"
+                    }
+                    spec = {
+                        forProvider = {
+                            defaultNodePool = {
+                                name = "default"
+                                nodeCount = 1
+                                vmSize = "Standard_B2s"
+                                zones = ["1", "2", "3"]
+                            }
+                        }
+                    }
+                }
+            ]
+            compositionPath: "apis/aks/composition.yaml"
+            xrPath: "examples/aks/aks-zones.yaml"
             xrdPath: "apis/aks/definition.yaml"
             timeoutSeconds: 60
             validate: False

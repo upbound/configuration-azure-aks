@@ -8,7 +8,12 @@ schema DefaultSpec:
     providerConfigRef: {str:str}
     forProvider: {str:str}
 
-oxr = aks.AKS {**option("params").oxr}
+# Strip spec.crossplane before typed construction: under up v0.50.0 the observed
+# composite carries spec.crossplane.resourceRefs as untyped dicts, which fails the
+# typed AKS schema's resourceRefs validation. This composition never reads
+# spec.crossplane, so dropping it is safe and keeps output byte-identical.
+_oxrRaw = option("params").oxr
+oxr = aks.AKS {**{k = v for k, v in _oxrRaw if k != "spec"}, **{"spec" = {k = v for k, v in (_oxrRaw?.spec or {}) if k != "crossplane"}}}
 dxr = option("params").dxr
 ocds = option("params").ocds
 
@@ -38,6 +43,10 @@ _items = [
         status = {
             aks = {
                 oidcUrl = ocds?.kubernetesCluster?.Resource?.status?.atProvider?.oidcIssuerUrl
+                clusterName = ocds?.kubernetesCluster?.Resource?.metadata?.name
+                nodes = {
+                    vmSize = ocds?.kubernetesCluster?.Resource?.status?.atProvider?.defaultNodePool?.vmSize
+                }
             }
         }
     }
@@ -53,6 +62,8 @@ _items = [
                     name = "default"
                     nodeCount = oxr.spec.parameters.nodes.count
                     vmSize = oxr.spec.parameters.nodes.instanceType
+                    if oxr.spec.parameters.nodes?.availabilityZones:
+                        zones = oxr.spec.parameters.nodes.availabilityZones
                     vnetSubnetIdSelector.matchLabels = {
                         "azure.platform.upbound.io/network-id" = oxr.spec.parameters.id
                         "azure.platform.upbound.io/subnet-service-type" = "general"
