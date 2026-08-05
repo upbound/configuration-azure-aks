@@ -44,6 +44,8 @@ _items = [
             aks = {
                 oidcUrl = ocds?.kubernetesCluster?.Resource?.status?.atProvider?.oidcIssuerUrl
                 clusterName = ocds?.kubernetesCluster?.Resource?.metadata?.name
+                # SystemAssigned managed-identity principalId (single object on the MR, absent until reconciled)
+                identityPrincipalId = ocds?.kubernetesCluster?.Resource?.status?.atProvider?.identity?.principalId
                 nodes = {
                     vmSize = ocds?.kubernetesCluster?.Resource?.status?.atProvider?.defaultNodePool?.vmSize
                 }
