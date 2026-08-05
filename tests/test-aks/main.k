@@ -227,6 +227,10 @@ _items = [
                     status = {
                         atProvider = {
                             oidcIssuerUrl = "https://westus.oic.prod-aks.azure.com/example/"
+                            identity = {
+                                principalId = "11111111-2222-3333-4444-555555555555"
+                                $type = "SystemAssigned"
+                            }
                             defaultNodePool = {
                                 vmSize = "Standard_B2s"
                             }
@@ -256,6 +260,7 @@ _items = [
                         aks = {
                             clusterName = "configuration-azure-aks-aks"
                             oidcUrl = "https://westus.oic.prod-aks.azure.com/example/"
+                            identityPrincipalId = "11111111-2222-3333-4444-555555555555"
                             nodes = {
                                 vmSize = "Standard_B2s"
                             }

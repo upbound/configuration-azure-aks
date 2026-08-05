@@ -99,4 +99,21 @@ spec:
                 description: Freeform field containing status information for aks
                 type: object
                 x-kubernetes-preserve-unknown-fields: true
+                properties:
+                  clusterName:
+                    description: Name of the composed AKS cluster.
+                    type: string
+                  oidcUrl:
+                    description: OIDC issuer URL of the AKS cluster.
+                    type: string
+                  identityPrincipalId:
+                    description: Principal ID of the AKS cluster's SystemAssigned managed identity.
+                    type: string
+                  nodes:
+                    description: Observed node configuration of the AKS cluster.
+                    type: object
+                    properties:
+                      vmSize:
+                        description: VM size of the default node pool.
+                        type: string
             type: object
